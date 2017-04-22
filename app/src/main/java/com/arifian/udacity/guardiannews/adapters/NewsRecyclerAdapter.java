@@ -1,6 +1,8 @@
 package com.arifian.udacity.guardiannews.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +42,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        News news = newsList.get(position);
+        final News news = newsList.get(position);
         holder.titleTextView.setText(news.getTitle());
         holder.sectionTextView.setText(news.getSection());
         holder.dateTextView.setText(news.getDate());
@@ -62,6 +64,13 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         }else{
             holder.newsImageView.setVisibility(View.GONE);
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(news.getLink())));
+            }
+        });
     }
 
     @Override

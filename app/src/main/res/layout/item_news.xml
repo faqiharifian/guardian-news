@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:paddingTop="@dimen/default_space"
-    android:paddingBottom="@dimen/default_space">
+    android:paddingBottom="@dimen/default_space"
+    android:clickable="true"
+    android:foreground="?android:selectableItemBackground">
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
