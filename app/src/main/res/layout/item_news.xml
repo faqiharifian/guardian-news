@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:paddingTop="@dimen/default_space"
+    android:paddingBottom="@dimen/default_space">
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <ProgressBar
+            android:id="@+id/progress_news_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleSmall" />
+        <ImageView
+            android:id="@+id/image_news"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:paddingLeft="@dimen/default_space"
+        android:paddingRight="@dimen/default_space">
+        <View
+            android:id="@+id/view_center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true"/>
+        <TextView
+            android:id="@+id/text_news_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/view_center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="News Title here "/>
+        <TextView
+            android:id="@+id/text_news_section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_center"
+            android:textSize="12sp"
+            tools:text="News Section Here"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/text_news_date"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="right|center_vertical"
+        tools:text="21 Jan"/>
+</LinearLayout>
