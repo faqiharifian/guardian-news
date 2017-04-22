@@ -47,8 +47,6 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
         try {
             URL url = new URL(getUrlWithParams());
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
@@ -85,7 +83,7 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
     private String getUrlWithParams(){
         Uri.Builder builder = Uri.parse(url).buildUpon();
 //        ?lang=en&show-fields=thumbnail&from-date=2017-04-1&to-date=2017-04-22&order-by=newest&page=1&api-key=test
-//        builder.appendQueryParameter("q", "en");
+        if(!query.equals("")) builder.appendQueryParameter("q", query);
         builder.appendQueryParameter("lang", "en");
         builder.appendQueryParameter("show-fields", "thumbnail");
         builder.appendQueryParameter("page-size", "20");

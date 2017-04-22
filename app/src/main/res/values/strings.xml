@@ -5,4 +5,6 @@
     <string name="error_empty">No Books Found</string>
     <string name="error_server">Internal Server Error</string>
     <string name="error_response">Bad Server Response</string>
+    <string name="action_settings">Setting</string>
+    <string name="menu_search">Search</string>
 </resources>

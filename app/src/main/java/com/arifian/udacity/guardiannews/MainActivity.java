@@ -15,6 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +32,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>  {
     private final int ID_LOADER = 0;
+    String queryStr = "";
+    SearchView searchView;
     RecyclerView newsRecyclerView;
     NewsRecyclerAdapter newsAdapter;
     ProgressDialog progressDialog;
@@ -71,6 +77,46 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_news, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.clearFocus();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                queryStr = query;
+                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this).forceLoad();
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                queryStr = "";
+                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this).forceLoad();
+                searchView.clearFocus();
+                searchView.onActionViewCollapsed();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(receiver);
@@ -85,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
         showProgressDialog();
-        return new NewsAsyncTaskLoader(this, "", newsAdapter);
+        return new NewsAsyncTaskLoader(this, queryStr, newsAdapter);
     }
 
     @Override
