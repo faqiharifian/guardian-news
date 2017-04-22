@@ -4,9 +4,11 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.arifian.udacity.guardiannews.MainActivity;
 import com.arifian.udacity.guardiannews.entities.News;
+import com.arifian.udacity.guardiannews.entities.Preference;
 import com.arifian.udacity.guardiannews.utils.JSONUtils;
 
 import org.json.JSONException;
@@ -31,6 +33,7 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
     Context context;
     String query;
     RecyclerView.Adapter adapter;
+    List<News> newsList = null;
 
     public NewsAsyncTaskLoader(Context context, String query, RecyclerView.Adapter adapter) {
         super(context);
@@ -41,7 +44,7 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
 
     @Override
     public List<News> loadInBackground() {
-        List<News> newsList = new ArrayList<>();
+        newsList = new ArrayList<>();
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
         try {
@@ -57,6 +60,7 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
             } else {
                 ((MainActivity)context).showErrorServer();
             }
+            Log.e("URL", "FINISHED");
         } catch (JSONException je){
             ((MainActivity)context).showErrorResponse();
             je.printStackTrace();
@@ -77,21 +81,24 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
                 }
             }
         }
+        Log.e("URL", "RETURN");
         return newsList;
     }
 
     private String getUrlWithParams(){
+        Preference preference = new Preference(context);
         Uri.Builder builder = Uri.parse(url).buildUpon();
-//        ?lang=en&show-fields=thumbnail&from-date=2017-04-1&to-date=2017-04-22&order-by=newest&page=1&api-key=test
-        if(!query.equals("")) builder.appendQueryParameter("q", query);
+        if(!query.equals("")){
+            builder.appendQueryParameter("q", query);
+            builder.appendQueryParameter("order-by", preference.getSearchOrderBy());
+        }else{
+            builder.appendQueryParameter("order-by", preference.getGeneralOrderBy());
+        }
         builder.appendQueryParameter("lang", "en");
         builder.appendQueryParameter("show-fields", "thumbnail");
         builder.appendQueryParameter("page-size", "20");
-//        builder.appendQueryParameter("from-date", "thumbnail");
-//        builder.appendQueryParameter("to-date", "thumbnail");
-//        builder.appendQueryParameter("order-by", "thumbnail");
         builder.appendQueryParameter("page", "1");
-        builder.appendQueryParameter("api-key", "test");
+        builder.appendQueryParameter("api-key", "40597f78-8f7f-44a4-b2b7-a23f8a076694");
         return builder.toString();
     }
 
@@ -107,5 +114,22 @@ public class NewsAsyncTaskLoader extends AsyncTaskLoader<List<News>>{
             }
         }
         return output.toString();
+    }
+
+    @Override
+    public void deliverResult(final List<News> data) {
+        newsList = data;
+
+        if (isStarted()) {
+            super.deliverResult(data);
+        }
+
+    }
+
+    @Override
+    protected void onStartLoading() {
+        if (takeContentChanged() || newsList == null) {
+            forceLoad();
+        }
     }
 }

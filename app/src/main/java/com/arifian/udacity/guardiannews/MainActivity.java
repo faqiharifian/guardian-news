@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
@@ -24,13 +25,14 @@ import android.widget.TextView;
 
 import com.arifian.udacity.guardiannews.adapters.NewsRecyclerAdapter;
 import com.arifian.udacity.guardiannews.entities.News;
+import com.arifian.udacity.guardiannews.entities.Preference;
 import com.arifian.udacity.guardiannews.loaders.NewsAsyncTaskLoader;
 import com.arifian.udacity.guardiannews.utils.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>  {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>, SharedPreferences.OnSharedPreferenceChangeListener {
     private final int ID_LOADER = 0;
     String queryStr = "";
     SearchView searchView;
@@ -63,17 +65,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
 
-        getSupportLoaderManager().initLoader(ID_LOADER, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(ID_LOADER, null, this);
 
         if(!NetworkUtils.isConnected(this)){
             showErrorNoInternet();
-        }else{
-            hideErrors();
         }
 
         receiver = new NetworkStateChangeReceiver();
         filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
+
+        Preference prefs = new Preference(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public boolean onQueryTextSubmit(String query) {
                 queryStr = query;
-                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this).forceLoad();
+                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this);
                 searchView.clearFocus();
                 return true;
             }
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public boolean onClose() {
                 queryStr = "";
-                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this).forceLoad();
+                getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this);
                 searchView.clearFocus();
                 searchView.onActionViewCollapsed();
                 return true;
@@ -113,6 +116,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -146,6 +155,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         hideProgressDialog();
         showErrorEmpty();
         newsAdapter.setNews(new ArrayList<News>());
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this);
     }
 
     private void showProgressDialog() {
@@ -198,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }else{
                 hideErrors();
                 if(newsAdapter.getItemCount() == 0){
-                    getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this).forceLoad();
+                    getSupportLoaderManager().restartLoader(ID_LOADER, null, MainActivity.this);
                 }
             }
         }
